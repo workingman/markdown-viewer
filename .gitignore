@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+
+# Profiling
+*.profraw
+
+# Session logs (optional - can include if you want history)
+claude-sessions/
