@@ -8,13 +8,13 @@
 
 4. [x] Theme Support — Add light/dark theme toggle, persist preference in UserDefaults, respect system appearance as default, implement View > Toggle Theme menu item and Cmd+Shift+T shortcut `S`
 
-5. [ ] Internal Anchor Navigation — Enable internal anchor links to scroll to targets, implement animated highlighting on jump, add smart scrolling (instant for long distances, smooth for short) `S`
+5. [x] Internal Anchor Navigation — Enable internal anchor links to scroll to targets, implement animated highlighting on jump, add smart scrolling (instant for long distances, smooth for short) `S`
 
-6. [ ] Vi-Style Vertical Navigation — Implement j/k scrolling, gg/G for top/bottom, Ctrl+d/u for half-page, Ctrl+f/b for full-page scrolling with smart scroll behavior `M`
+6. [x] Vi-Style Vertical Navigation — Implement j/k scrolling, gg/G for top/bottom, Ctrl+d/u for half-page, Ctrl+f/b for full-page scrolling with smart scroll behavior `M`
 
-7. [ ] Vi-Style Horizontal Navigation — Implement h/l scrolling, 0/$ for far left/right navigation `S`
+7. [x] Vi-Style Horizontal Navigation — Implement h/l scrolling, 0/$ for far left/right navigation `S`
 
-8. [ ] Vi-Style Search — Implement / to open search box, real-time highlighting, n/N for next/previous match, Enter/Shift+Enter to jump and close, Esc to cancel, match count display `M`
+8. [x] Vi-Style Search — Implement / to open search box, real-time highlighting, n/N for next/previous match, Enter/Shift+Enter to jump and close, Esc to cancel, match count display `M`
 
 9. [ ] Live Reload — Monitor open file for changes with 1-second polling, auto re-render on modification, preserve scroll position during reload `S`
 

@@ -27,7 +27,7 @@ struct ContentView: View {
         ZStack {
             WebView(content: document.content, fileURL: currentFileURL)
                 .environmentObject(appearanceManager)
-                .frame(minWidth: 800, minHeight: 600)
+                .frame(minWidth: 400, minHeight: 300)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             // Drop zone overlay for visual feedback

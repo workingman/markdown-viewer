@@ -30,13 +30,10 @@ struct MarkdownDocument: FileDocument {
         // Attempt to decode as UTF-8, fall back to other encodings
         if let text = String(data: data, encoding: .utf8) {
             self.content = text
+        } else if let text = String(data: data, encoding: .isoLatin1) {
+            self.content = text
         } else {
-            // If UTF-8 decoding fails, try other common encodings
-            if let text = String(data: data, encoding: .isoLatin1) {
-                self.content = text
-            } else {
-                throw CocoaError(.fileReadInapplicableStringEncoding)
-            }
+            throw CocoaError(.fileReadInapplicableStringEncoding)
         }
     }
 

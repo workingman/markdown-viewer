@@ -671,3 +671,322 @@ final class MarkdownEdgeCaseTests: XCTestCase {
                       "Nested markdown should be handled")
     }
 }
+
+// MARK: - Anchor Navigation Tests
+
+final class AnchorNavigationTests: XCTestCase {
+
+    // MARK: - Test 1: HTML includes anchor click handler
+
+    func testHTMLIncludesAnchorClickHandler() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("a[href^=\"#\"]"),
+                      "HTML should include anchor link click handler selector")
+    }
+
+    // MARK: - Test 2: HTML includes anchor highlight CSS
+
+    func testHTMLIncludesAnchorHighlightCSS() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("anchor-highlight"),
+                      "HTML should include anchor-highlight CSS class")
+        XCTAssertTrue(html.contains("@keyframes anchor-highlight"),
+                      "HTML should include anchor-highlight animation keyframes")
+    }
+
+    // MARK: - Test 3: HTML includes smart scroll behavior logic
+
+    func testHTMLIncludesSmartScrollBehavior() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("viewportHeight * 2"),
+                      "HTML should include smart scroll distance calculation")
+        XCTAssertTrue(html.contains("behavior: behavior"),
+                      "HTML should use dynamic scroll behavior")
+    }
+
+    // MARK: - Test 4: HTML includes scroll offset
+
+    func testHTMLIncludesScrollOffset() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("offset = 16"),
+                      "HTML should include 16px scroll offset")
+    }
+
+    // MARK: - Test 5: Dark theme has anchor highlight variant
+
+    func testDarkThemeHasAnchorHighlightVariant() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("anchor-highlight-dark"),
+                      "HTML should include dark theme anchor highlight animation")
+        XCTAssertTrue(html.contains("html.theme-dark .anchor-highlight"),
+                      "HTML should style anchor-highlight for forced dark theme")
+    }
+}
+
+// MARK: - Vi-Style Vertical Navigation Tests
+
+final class ViNavigationTests: XCTestCase {
+
+    // MARK: - Test 1: HTML includes vi navigation keydown handler
+
+    func testHTMLIncludesViNavigationHandler() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("Vi-style vertical navigation"),
+                      "HTML should include vi navigation code block")
+        XCTAssertTrue(html.contains("addEventListener('keydown'"),
+                      "HTML should include keydown event listener")
+    }
+
+    // MARK: - Test 2: HTML includes j/k line scrolling
+
+    func testHTMLIncludesLineScrolling() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("case 'j':"),
+                      "HTML should handle j key for scroll down")
+        XCTAssertTrue(html.contains("case 'k':"),
+                      "HTML should handle k key for scroll up")
+        XCTAssertTrue(html.contains("LINE_HEIGHT"),
+                      "HTML should define LINE_HEIGHT constant")
+    }
+
+    // MARK: - Test 3: HTML includes gg sequence handling
+
+    func testHTMLIncludesGGSequence() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("lastKey === 'g'"),
+                      "HTML should track g key sequence")
+        XCTAssertTrue(html.contains("lastKeyTime") && html.contains("500"),
+                      "HTML should use 500ms timeout for gg sequence")
+    }
+
+    // MARK: - Test 4: HTML includes G for bottom navigation
+
+    func testHTMLIncludesGForBottom() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("case 'G':"),
+                      "HTML should handle G key for jump to bottom")
+        XCTAssertTrue(html.contains("document.body.scrollHeight"),
+                      "HTML should scroll to document bottom")
+    }
+
+    // MARK: - Test 5: HTML includes Ctrl+d/u half-page scrolling
+
+    func testHTMLIncludesHalfPageScrolling() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("case 'd':") && html.contains("e.ctrlKey"),
+                      "HTML should handle Ctrl+d")
+        XCTAssertTrue(html.contains("case 'u':") && html.contains("e.ctrlKey"),
+                      "HTML should handle Ctrl+u")
+        XCTAssertTrue(html.contains("viewportHeight / 2"),
+                      "HTML should scroll by half viewport height")
+    }
+
+    // MARK: - Test 6: HTML includes Ctrl+f/b full-page scrolling
+
+    func testHTMLIncludesFullPageScrolling() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("case 'f':") && html.contains("e.ctrlKey"),
+                      "HTML should handle Ctrl+f")
+        XCTAssertTrue(html.contains("case 'b':") && html.contains("e.ctrlKey"),
+                      "HTML should handle Ctrl+b")
+    }
+
+    // MARK: - Test 7: HTML ignores keys in input fields
+
+    func testHTMLIgnoresInputFields() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("e.target.tagName === 'INPUT'"),
+                      "HTML should ignore keys when in INPUT field")
+        XCTAssertTrue(html.contains("e.target.tagName === 'TEXTAREA'"),
+                      "HTML should ignore keys when in TEXTAREA field")
+    }
+
+    // MARK: - Test 8: HTML includes h/l horizontal scrolling
+
+    func testHTMLIncludesHorizontalScrolling() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("case 'h':"),
+                      "HTML should handle h key for scroll left")
+        XCTAssertTrue(html.contains("case 'l':"),
+                      "HTML should handle l key for scroll right")
+        XCTAssertTrue(html.contains("left: -LINE_HEIGHT"),
+                      "HTML should scroll left by LINE_HEIGHT")
+        XCTAssertTrue(html.contains("left: LINE_HEIGHT"),
+                      "HTML should scroll right by LINE_HEIGHT")
+    }
+
+    // MARK: - Test 9: HTML includes 0/$ for far left/right
+
+    func testHTMLIncludesFarLeftRightNavigation() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("case '0':"),
+                      "HTML should handle 0 key for far left")
+        XCTAssertTrue(html.contains("case '$':"),
+                      "HTML should handle $ key for far right")
+        XCTAssertTrue(html.contains("left: 0"),
+                      "HTML should scroll to left: 0")
+        XCTAssertTrue(html.contains("document.body.scrollWidth"),
+                      "HTML should scroll to scrollWidth for far right")
+    }
+}
+
+// MARK: - Vi-Style Search Tests
+
+final class ViSearchTests: XCTestCase {
+
+    // MARK: - Test 1: HTML includes search box
+
+    func testHTMLIncludesSearchBox() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("id=\"searchBox\""),
+                      "HTML should include search box element")
+        XCTAssertTrue(html.contains("id=\"searchInput\""),
+                      "HTML should include search input element")
+        XCTAssertTrue(html.contains("id=\"searchCount\""),
+                      "HTML should include search count element")
+    }
+
+    // MARK: - Test 2: HTML includes search box CSS
+
+    func testHTMLIncludesSearchBoxCSS() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains(".search-box"),
+                      "HTML should include search-box CSS class")
+        XCTAssertTrue(html.contains(".search-box.visible"),
+                      "HTML should include visible state for search box")
+    }
+
+    // MARK: - Test 3: HTML includes search match highlighting CSS
+
+    func testHTMLIncludesSearchMatchCSS() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains(".search-match"),
+                      "HTML should include search-match CSS class")
+        XCTAssertTrue(html.contains(".search-match-current"),
+                      "HTML should include search-match-current CSS class")
+    }
+
+    // MARK: - Test 4: HTML includes search functionality
+
+    func testHTMLIncludesSearchFunctionality() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("Vi-style search functionality"),
+                      "HTML should include search functionality code")
+        XCTAssertTrue(html.contains("highlightMatches"),
+                      "HTML should include highlightMatches function")
+        XCTAssertTrue(html.contains("clearHighlights"),
+                      "HTML should include clearHighlights function")
+    }
+
+    // MARK: - Test 5: HTML includes / key handler
+
+    func testHTMLIncludesSlashKeyHandler() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("e.key === '/'"),
+                      "HTML should handle / key to open search")
+        XCTAssertTrue(html.contains("openSearch"),
+                      "HTML should include openSearch function")
+    }
+
+    // MARK: - Test 6: HTML includes n/N navigation
+
+    func testHTMLIncludesMatchNavigation() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("e.key === 'n'"),
+                      "HTML should handle n key for next match")
+        XCTAssertTrue(html.contains("e.key === 'N'"),
+                      "HTML should handle N key for previous match")
+        XCTAssertTrue(html.contains("nextMatch"),
+                      "HTML should include nextMatch function")
+        XCTAssertTrue(html.contains("prevMatch"),
+                      "HTML should include prevMatch function")
+    }
+
+    // MARK: - Test 7: HTML includes Escape to close
+
+    func testHTMLIncludesEscapeToClose() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("'Escape'"),
+                      "HTML should handle Escape key")
+        XCTAssertTrue(html.contains("closeSearch"),
+                      "HTML should include closeSearch function")
+    }
+
+    // MARK: - Test 8: HTML includes match count display
+
+    func testHTMLIncludesMatchCountDisplay() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("updateCount"),
+                      "HTML should include updateCount function")
+        XCTAssertTrue(html.contains("searchCount.textContent"),
+                      "HTML should update search count text")
+    }
+
+    // MARK: - Test 9: HTML includes Enter/Shift+Enter handling
+
+    func testHTMLIncludesEnterHandling() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("e.key === 'Enter'"),
+                      "HTML should handle Enter key")
+        XCTAssertTrue(html.contains("e.shiftKey"),
+                      "HTML should check for Shift+Enter")
+    }
+
+    // MARK: - Test 10: HTML includes real-time search
+
+    func testHTMLIncludesRealTimeSearch() {
+        let webView = WebView(content: "# Test")
+        let html = webView.wrapInHTML("# Test")
+
+        XCTAssertTrue(html.contains("addEventListener('input'"),
+                      "HTML should listen for input events")
+        XCTAssertTrue(html.contains("highlightMatches(searchInput.value)"),
+                      "HTML should highlight matches on input")
+    }
+}
