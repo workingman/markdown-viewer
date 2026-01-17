@@ -1,8 +1,17 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// Notification for refreshing the current document
+extension Notification.Name {
+    static let refreshDocument = Notification.Name("refreshDocument")
+}
+
 struct ContentView: View {
-    @Binding var document: MarkdownDocument
+    /// The document content (read-only, no binding to avoid dirty flag issues)
+    let document: MarkdownDocument
+
+    /// The displayed content (can be updated on drag-drop without affecting document dirty state)
+    @State private var displayedContent: String
 
     /// The current file URL (from DocumentGroup or from drag-drop)
     @State var currentFileURL: URL?
@@ -17,15 +26,22 @@ struct ContentView: View {
     /// Appearance manager from environment
     @EnvironmentObject var appearanceManager: AppearanceManager
 
-    /// Initialize with document binding and optional file URL
-    init(document: Binding<MarkdownDocument>, fileURL: URL? = nil) {
-        self._document = document
+    /// File watcher for live reload
+    @StateObject private var fileWatcher = FileWatcher()
+
+    /// Trigger for scroll position preservation during reload
+    @State private var preserveScrollOnReload = false
+
+    /// Initialize with document and optional file URL
+    init(document: MarkdownDocument, fileURL: URL? = nil) {
+        self.document = document
+        self._displayedContent = State(initialValue: document.content)
         self._currentFileURL = State(initialValue: fileURL)
     }
 
     var body: some View {
         ZStack {
-            WebView(content: document.content, fileURL: currentFileURL)
+            WebView(content: displayedContent, fileURL: currentFileURL, preserveScroll: preserveScrollOnReload)
                 .environmentObject(appearanceManager)
                 .frame(minWidth: 400, minHeight: 300)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -46,6 +62,47 @@ struct ContentView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage)
+        }
+        .onAppear {
+            // Start watching the file when view appears
+            fileWatcher.watch(currentFileURL)
+        }
+        .onDisappear {
+            // Stop watching when view disappears
+            fileWatcher.stop()
+        }
+        .onChange(of: currentFileURL) { newURL in
+            // Update watcher when file changes (e.g., drag-drop)
+            fileWatcher.watch(newURL)
+        }
+        .onReceive(fileWatcher.$lastModified) { _ in
+            // Reload content when file changes
+            reloadContent()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .refreshDocument)) { _ in
+            reloadContent()
+        }
+    }
+
+    /// Reloads the content from the current file
+    private func reloadContent() {
+        guard let url = currentFileURL else { return }
+
+        let result = FileValidator.readMarkdownFile(at: url)
+        switch result {
+        case .success(let content):
+            // Only update if content actually changed
+            if content != displayedContent {
+                preserveScrollOnReload = true
+                displayedContent = content
+                // Reset flag after a brief delay to allow WebView to process
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    preserveScrollOnReload = false
+                }
+            }
+        case .failure:
+            // Silently ignore reload failures (file might be temporarily unavailable)
+            break
         }
     }
 
@@ -74,7 +131,7 @@ struct ContentView: View {
                 let result = FileValidator.readMarkdownFile(at: url)
                 switch result {
                 case .success(let content):
-                    document.content = content
+                    displayedContent = content
                     currentFileURL = url
                 case .failure(let validationError):
                     switch validationError {
@@ -100,6 +157,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(document: .constant(MarkdownDocument()))
+    ContentView(document: MarkdownDocument())
         .environmentObject(AppearanceManager.shared)
 }

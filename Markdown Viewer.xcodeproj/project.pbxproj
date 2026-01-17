@@ -21,6 +21,7 @@
 		A1000033248B0033 /* markdown-it-anchor.min.js in Resources */ = {isa = PBXBuildFile; fileRef = A1000034248B0034 /* markdown-it-anchor.min.js */; };
 		A1000035248B0035 /* markdown-it-task-lists.min.js in Resources */ = {isa = PBXBuildFile; fileRef = A1000036248B0036 /* markdown-it-task-lists.min.js */; };
 		A1000040248B0040 /* AppearanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000041248B0041 /* AppearanceManager.swift */; };
+		A1000042248B0042 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000043248B0043 /* FileWatcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		A1000034248B0034 /* markdown-it-anchor.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "markdown-it-anchor.min.js"; sourceTree = "<group>"; };
 		A1000036248B0036 /* markdown-it-task-lists.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "markdown-it-task-lists.min.js"; sourceTree = "<group>"; };
 		A1000041248B0041 /* AppearanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
+		A1000043248B0043 /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				A100002E248B002E /* PathHelper.swift */,
 				A1000030248B0030 /* FileValidator.swift */,
 				A1000041248B0041 /* AppearanceManager.swift */,
+				A1000043248B0043 /* FileWatcher.swift */,
 				A1000006248B0006 /* Assets.xcassets */,
 				A100000F248B000F /* Markdown Viewer.entitlements */,
 				A1000017248B0017 /* Preview Content */,
@@ -253,6 +256,7 @@
 				A100002D248B002D /* PathHelper.swift in Sources */,
 				A100002F248B002F /* FileValidator.swift in Sources */,
 				A1000040248B0040 /* AppearanceManager.swift in Sources */,
+				A1000042248B0042 /* FileWatcher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

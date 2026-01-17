@@ -7,13 +7,21 @@ struct MarkdownViewerApp: App {
 
     var body: some Scene {
         DocumentGroup(viewing: MarkdownDocument.self) { file in
-            ContentView(document: file.$document, fileURL: file.fileURL)
+            ContentView(document: file.document, fileURL: file.fileURL)
                 .environmentObject(appearanceManager)
         }
         .defaultSize(width: 800, height: 600)
         .commands {
             // View > Appearance submenu
             CommandGroup(after: .toolbar) {
+                // Refresh menu item
+                Button("Refresh") {
+                    NotificationCenter.default.post(name: .refreshDocument, object: nil)
+                }
+                .keyboardShortcut("r", modifiers: .command)
+
+                Divider()
+
                 // Appearance submenu with Picker for checkmark behavior
                 Picker("Appearance", selection: $appearanceManager.preference) {
                     Text("System").tag(AppearancePreference.system)

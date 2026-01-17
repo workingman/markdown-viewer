@@ -11,6 +11,9 @@ struct WebView: NSViewRepresentable {
     /// Optional file URL for resolving relative paths (images, links)
     let fileURL: URL?
 
+    /// Whether to preserve scroll position on content update
+    let preserveScroll: Bool
+
     /// Environment object for appearance preference
     @EnvironmentObject var appearanceManager: AppearanceManager
 
@@ -18,9 +21,11 @@ struct WebView: NSViewRepresentable {
     /// - Parameters:
     ///   - content: The raw markdown content to display
     ///   - fileURL: Optional URL of the markdown file for baseURL resolution
-    init(content: String, fileURL: URL? = nil) {
+    ///   - preserveScroll: Whether to preserve scroll position on reload (default: false)
+    init(content: String, fileURL: URL? = nil, preserveScroll: Bool = false) {
         self.content = content
         self.fileURL = fileURL
+        self.preserveScroll = preserveScroll
     }
 
     func makeCoordinator() -> Coordinator {
@@ -49,6 +54,18 @@ struct WebView: NSViewRepresentable {
     func updateNSView(_ nsView: WKWebView, context: Context) {
         // Handle content changes
         if content != context.coordinator.lastContent {
+            // Save scroll position if preserveScroll is enabled
+            if preserveScroll {
+                nsView.evaluateJavaScript("JSON.stringify({x: window.scrollX, y: window.scrollY})") { result, _ in
+                    if let jsonString = result as? String,
+                       let data = jsonString.data(using: .utf8),
+                       let json = try? JSONSerialization.jsonObject(with: data) as? [String: CGFloat],
+                       let x = json["x"], let y = json["y"] {
+                        context.coordinator.pendingScrollPosition = (x, y)
+                    }
+                }
+            }
+
             context.coordinator.lastContent = content
             context.coordinator.lastAppearance = appearanceManager.preference
             let html = wrapInHTML(content)
@@ -76,6 +93,16 @@ struct WebView: NSViewRepresentable {
     class Coordinator: NSObject, WKNavigationDelegate {
         var lastContent: String = ""
         var lastAppearance: AppearancePreference = .system
+        var pendingScrollPosition: (x: CGFloat, y: CGFloat)?
+
+        /// Called when page finishes loading - restores scroll position if pending
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            guard let position = pendingScrollPosition else { return }
+            pendingScrollPosition = nil
+
+            let js = "window.scrollTo(\(position.x), \(position.y));"
+            webView.evaluateJavaScript(js, completionHandler: nil)
+        }
 
         /// Intercepts navigation actions to handle external links
         /// - Parameters:
@@ -147,6 +174,8 @@ struct WebView: NSViewRepresentable {
         result = result.replacingOccurrences(of: "\\", with: "\\\\")
         result = result.replacingOccurrences(of: "`", with: "\\`")
         result = result.replacingOccurrences(of: "$", with: "\\$")
+        // Escape </script> to prevent premature script tag closure in HTML
+        result = result.replacingOccurrences(of: "</script>", with: "<\\/script>", options: .caseInsensitive)
         return result
     }
 

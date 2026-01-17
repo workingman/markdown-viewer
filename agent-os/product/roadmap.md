@@ -16,9 +16,9 @@
 
 8. [x] Vi-Style Search — Implement / to open search box, real-time highlighting, n/N for next/previous match, Enter/Shift+Enter to jump and close, Esc to cancel, match count display `M`
 
-9. [ ] Live Reload — Monitor open file for changes with 1-second polling, auto re-render on modification, preserve scroll position during reload `S`
+9. [x] Live Reload — Monitor open file for changes with 1-second polling, auto re-render on modification, preserve scroll position during reload `S`
 
-10. [ ] File Associations — Register as handler for .md and .markdown files, configure UTI for net.daringfireball.markdown, appear in Open With menu `S`
+10. [x] File Associations — Register as handler for .md and .markdown files, configure UTI for net.daringfireball.markdown, appear in Open With menu `S`
 
 11. [ ] Multiple Windows — Support multiple open windows (one file per window), implement File > New Window, File > Close, remember window size/position per file `M`
 
