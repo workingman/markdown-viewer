@@ -2,6 +2,68 @@ import SwiftUI
 import WebKit
 import AppKit
 
+// MARK: - WebViewManager
+
+/// Manages the active WKWebView instance for menu command handling
+final class WebViewManager: ObservableObject {
+    static let shared = WebViewManager()
+
+    /// The currently active WKWebView
+    weak var activeWebView: WKWebView?
+
+    /// Current zoom level (1.0 = 100%)
+    @Published private(set) var zoomLevel: CGFloat = 1.0
+
+    private let zoomStep: CGFloat = 0.1
+    private let minZoom: CGFloat = 0.5
+    private let maxZoom: CGFloat = 3.0
+
+    private init() {}
+
+    func zoomActualSize() {
+        zoomLevel = 1.0
+        activeWebView?.pageZoom = zoomLevel
+    }
+
+    func zoomIn() {
+        zoomLevel = min(zoomLevel + zoomStep, maxZoom)
+        activeWebView?.pageZoom = zoomLevel
+    }
+
+    func zoomOut() {
+        zoomLevel = max(zoomLevel - zoomStep, minZoom)
+        activeWebView?.pageZoom = zoomLevel
+    }
+
+    func openFind() {
+        activeWebView?.evaluateJavaScript("window.viSearch && window.viSearch.open();", completionHandler: nil)
+    }
+
+    func print() {
+        guard let webView = activeWebView else { return }
+        let printInfo = NSPrintInfo.shared
+        printInfo.horizontalPagination = .fit
+        printInfo.verticalPagination = .automatic
+        let printOperation = webView.printOperation(with: printInfo)
+        printOperation.showsPrintPanel = true
+        printOperation.showsProgressPanel = true
+        printOperation.run()
+    }
+}
+
+// MARK: - ReadOnlyWebView
+
+/// Custom WKWebView subclass that prevents undo registration
+/// This stops the document from being marked as edited when using search
+final class ReadOnlyWebView: WKWebView {
+    override var undoManager: UndoManager? {
+        // Return nil to prevent any undo registration
+        return nil
+    }
+}
+
+// MARK: - WebView
+
 /// NSViewRepresentable wrapper for WKWebView to display markdown content
 /// Uses markdown-it with plugins for GitHub-flavored markdown rendering
 struct WebView: NSViewRepresentable {
@@ -37,13 +99,18 @@ struct WebView: NSViewRepresentable {
     /// - Returns: Configured WKWebView instance
     func makeNSView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+        let webView = ReadOnlyWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
+
         let html = wrapInHTML(content)
         let baseURL = fileURL?.deletingLastPathComponent()
         webView.loadHTMLString(html, baseURL: baseURL)
         context.coordinator.lastContent = content
         context.coordinator.lastAppearance = appearanceManager.preference
+
+        // Register as active web view for menu commands
+        WebViewManager.shared.activeWebView = webView
+
         return webView
     }
 

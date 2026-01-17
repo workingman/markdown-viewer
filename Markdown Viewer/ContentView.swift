@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import AppKit
 
 /// Notification for refreshing the current document
 extension Notification.Name {
@@ -82,6 +83,63 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .refreshDocument)) { _ in
             reloadContent()
         }
+        // Menu command handlers
+        .onReceive(NotificationCenter.default.publisher(for: .openFind)) { _ in
+            WebViewManager.shared.openFind()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .zoomActualSize)) { _ in
+            WebViewManager.shared.zoomActualSize()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .zoomIn)) { _ in
+            WebViewManager.shared.zoomIn()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .zoomOut)) { _ in
+            WebViewManager.shared.zoomOut()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .printDocument)) { _ in
+            WebViewManager.shared.print()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .showKeyboardShortcuts)) { _ in
+            showKeyboardShortcuts()
+        }
+    }
+
+    /// Shows the keyboard shortcuts help window
+    private func showKeyboardShortcuts() {
+        let shortcuts = """
+        Navigation:
+          j/k         Scroll down/up
+          h/l         Scroll left/right
+          gg          Go to top
+          G           Go to bottom
+          Ctrl+d/u    Half page down/up
+          Ctrl+f/b    Full page down/up
+
+        Search:
+          /           Open search
+          n/N         Next/previous match
+          Esc         Close search
+
+        View:
+          Cmd+R       Refresh
+          Cmd+Shift+T Cycle theme
+          Cmd+0       Actual size
+          Cmd++       Zoom in
+          Cmd+-       Zoom out
+
+        File:
+          Cmd+O       Open file
+          Cmd+N       New window
+          Cmd+W       Close window
+          Cmd+P       Print
+        """
+
+        let alert = NSAlert()
+        alert.messageText = "Keyboard Shortcuts"
+        alert.informativeText = shortcuts
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
 
     /// Reloads the content from the current file
