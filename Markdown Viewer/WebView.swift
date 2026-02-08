@@ -40,14 +40,24 @@ final class WebViewManager: ObservableObject {
     }
 
     func print() {
-        guard let webView = activeWebView else { return }
+        guard let webView = activeWebView,
+              let window = webView.window else { return }
+
         let printInfo = NSPrintInfo.shared
         printInfo.horizontalPagination = .fit
         printInfo.verticalPagination = .automatic
+        printInfo.topMargin = 36
+        printInfo.bottomMargin = 36
+        printInfo.leftMargin = 36
+        printInfo.rightMargin = 36
+
         let printOperation = webView.printOperation(with: printInfo)
         printOperation.showsPrintPanel = true
         printOperation.showsProgressPanel = true
-        printOperation.run()
+        printOperation.view?.frame = webView.bounds
+
+        // Must use runModal instead of run() for WKWebView printing to work
+        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
     }
 }
 

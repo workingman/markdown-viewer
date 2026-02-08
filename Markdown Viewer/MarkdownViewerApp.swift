@@ -11,7 +11,7 @@ struct MarkdownViewerApp: App {
             ContentView(document: file.document, fileURL: file.fileURL)
                 .environmentObject(appearanceManager)
         }
-        .defaultSize(width: 800, height: 600)
+        .defaultSize(width: 960, height: (NSScreen.main?.visibleFrame.height ?? 900) * 0.98)
         .commands {
             // MARK: - File Menu
             // Remove "New" item (read-only viewer, only Open makes sense)
