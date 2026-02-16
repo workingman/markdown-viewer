@@ -1,9 +1,9 @@
 # Session Notes - Markdown Viewer
 
 ## Current Status
-**MVP COMPLETE and deployed to /Applications!** 8 of 16 specs done.
+**MVP COMPLETE and deployed to /Applications!** 9 of 16 specs done.
 
-**Completed (MVP):**
+**Completed (MVP + post-MVP):**
 1. [x] Basic Window and File Opening
 2. [x] Markdown Rendering (markdown-it integration)
 3. [x] Styling and Typography (VS Code-like, 16px font, centered content)
@@ -12,8 +12,15 @@
 6. [x] Vi-Style Vertical Navigation (j/k, gg/G, Ctrl+d/u/f/b)
 7. [x] Vi-Style Horizontal Navigation (h/l, 0/$)
 8. [x] Vi-Style Search (/, n/N, Enter, Esc, match count)
+9. [x] Live Reload (file watcher)
 
-**Next up:** Spec 9 - Live Reload (post-MVP)
+**Recent changes (2026-02-08):**
+- Window size: now 960pt wide, 98% of screen height (was 800x600 fixed)
+- Print fix: WKWebView printing uses runModal for reliable output
+
+**Still pending (deploy):** User needs to run sudo deploy command to update /Applications
+
+**Next up:** Spec 10+ (see roadmap)
 
 ## Key Locations
 - **Xcode project:** `/Users/gwr/Documents/dev/mdv/Markdown Viewer.xcodeproj`
