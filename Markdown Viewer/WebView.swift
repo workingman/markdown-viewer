@@ -5,7 +5,7 @@ import AppKit
 // MARK: - WebViewManager
 
 /// Manages the active WKWebView instance for menu command handling
-final class WebViewManager: ObservableObject {
+final class WebViewManager: NSObject, ObservableObject {
     static let shared = WebViewManager()
 
     /// The currently active WKWebView
@@ -18,7 +18,12 @@ final class WebViewManager: ObservableObject {
     private let minZoom: CGFloat = 0.5
     private let maxZoom: CGFloat = 3.0
 
-    private init() {}
+    /// Guards against re-entrant print() calls that would queue multiple print sheets
+    private var isPrinting = false
+
+    private override init() {
+        super.init()
+    }
 
     func zoomActualSize() {
         zoomLevel = 1.0
@@ -41,7 +46,10 @@ final class WebViewManager: ObservableObject {
 
     func print() {
         guard let webView = activeWebView,
-              let window = webView.window else { return }
+              let window = webView.window,
+              !isPrinting else { return }
+
+        isPrinting = true
 
         let printInfo = NSPrintInfo.shared
         printInfo.horizontalPagination = .fit
@@ -56,8 +64,19 @@ final class WebViewManager: ObservableObject {
         printOperation.showsProgressPanel = true
         printOperation.view?.frame = webView.bounds
 
-        // Must use runModal instead of run() for WKWebView printing to work
-        printOperation.runModal(for: window, delegate: nil, didRun: nil, contextInfo: nil)
+        // runModal(for:) is async and returns immediately. The didRun callback clears
+        // isPrinting so a fresh Cmd+P can show a new sheet, while suppressing duplicate
+        // print() calls that would otherwise stack multiple sheets.
+        printOperation.runModal(for: window,
+                                delegate: self,
+                                didRun: #selector(printOperationDidRun(_:success:contextInfo:)),
+                                contextInfo: nil)
+    }
+
+    @objc private func printOperationDidRun(_ printOperation: NSPrintOperation,
+                                            success: Bool,
+                                            contextInfo: UnsafeMutableRawPointer?) {
+        isPrinting = false
     }
 }
 
@@ -281,8 +300,6 @@ struct WebView: NSViewRepresentable {
                     margin: 0;
                     padding: 20px 26px;
                     word-wrap: break-word;
-                    display: flex;
-                    justify-content: center;
                 }
                 @media (prefers-color-scheme: dark) {
                     body {
@@ -312,7 +329,7 @@ struct WebView: NSViewRepresentable {
                 }
                 .markdown-body {
                     max-width: 980px;
-                    width: 100%;
+                    margin: 0 auto;
                 }
                 pre {
                     background-color: #f6f8fa;
